@@ -1,0 +1,66 @@
+﻿@page "/CarDebts/{CarId:int}";
+@using ParkingServiceStores.Data.Models;
+@using ParkingServiceStores.Data;
+@using Microsoft.EntityFrameworkCore;
+@inject ApplicationDbContext dbContext;
+@inject NavigationManager NavigationManager;
+@if (car == null)
+{
+    <h3>Car Debts</h3>
+}
+else
+{
+    <h3><b>@car.ToString()</b> debts:</h3>
+}
+
+@if (debts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (debts.Count == 0)
+{
+    <p><em>There are no debts for this car!</em></p>
+    <button class="btn-primary" @onclick="BackToCarsClicked">Back to cars</button>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Debt amount</th>
+                <th>Is payed</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var debt in debts)
+            {
+                <tr>
+                    <td>@debt.DebtAmount.ToString("0.00")</td>
+                    <td>@(debt.IsPayed ? "Yeas" : "No")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <h3>Total active debt: <b>@debts.Where(r => !r.IsPayed).Sum(r => r.DebtAmount)</b></h3>
+    <button class="btn-primary" @onclick="BackToCarsClicked">Back to cars</button>
+
+}
+
+@code {
+    [Parameter]
+    public int CarId { get; set; }
+
+    List<Debt> debts;
+
+    Car car;
+
+    protected override async Task OnInitializedAsync()
+    {
+        debts = await dbContext.Debts.Where(r => r.CarId == CarId).ToListAsync();
+        car = await dbContext.Cars.SingleAsync(r => r.Id == CarId);
+    }
+    private void BackToCarsClicked()
+    {
+        NavigationManager.NavigateTo("/cars");
+    }
+}

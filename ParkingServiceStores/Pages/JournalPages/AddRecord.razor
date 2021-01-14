@@ -3,6 +3,7 @@
 @using ParkingServiceStores.Data.Models;
 @using Microsoft.EntityFrameworkCore;
 @inject ApplicationDbContext dbContext;
+@inject DebtAmountCalculator DebtAmountCalculator;
 @inject NavigationManager NavigationManager;
 @inject IJSRuntime js;
 <h3>Add Journal Record Page</h3>
@@ -52,7 +53,7 @@ else
         record.CarId = cars.First().Id;
         record.EntryTime = DateTime.Now;
         record.LeavingTime = DateTime.Now.AddDays(1);
-            
+
     }
 
     private async void OnFormSubmit()
@@ -63,6 +64,14 @@ else
             return;
         }
         await dbContext.Journal.AddAsync(record);
+        await dbContext.SaveChangesAsync();
+
+        Debt debt = new Debt();
+        debt.CarId = record.CarId;
+        TimeSpan period = record.LeavingTime - record.EntryTime;
+        Price lastPrice = await dbContext.Prices.OrderBy(r => r.Date).LastAsync();
+        debt.DebtAmount = DebtAmountCalculator.CalculateDebtAmount(period,lastPrice);
+        await dbContext.Debts.AddAsync(debt);
         await dbContext.SaveChangesAsync();
         NavigationManager.NavigateTo("/journal");
     }

@@ -22,7 +22,7 @@ else
                 <th>Color</th>
                 <th>Plate Number</th>
                 <th>Owner's name</th>
-                <th>Owner's phone number</th>
+                <th>Owner's phone</th>
             </tr>
         </thead>
         <tbody>
@@ -35,9 +35,19 @@ else
                     <td>@car.Owner.Name</td>
                     <td>@car.Owner.PhoneNumber</td>
                     <td>
-                        <a class="nav-link" href="/EditCar/@car.Id">
-                            Edit
-                        </a>
+                        <div class="row">
+                            <div class="col-sm-auto" >
+                                <a class="nav-link" href="/EditCar/@car.Id">
+                                    Edit
+                                </a>
+                            </div>
+                            <div class="col-sm-auto">
+                                <a class="nav-link" href="/CarDebts/@car.Id">
+                                    View debts
+                                </a>
+                            </div>
+                        </div>
+                        
                         <button class="btn-danger" @onclick="(() => OnDeleteClicked(car))">
                             Delete
                         </button>

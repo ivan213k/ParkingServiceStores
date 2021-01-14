@@ -8,7 +8,7 @@ namespace ParkingServiceStores.Data
         public decimal CalculateDebtAmount(TimeSpan period, Price price)
         {
             decimal totalAmount = 0;
-            totalAmount += (decimal)period.TotalDays * price.OneDayPrice;
+            totalAmount += (decimal)period.Days * price.OneDayPrice;
             totalAmount += period.Hours * price.OneHourPrice;
             return totalAmount;
         }
