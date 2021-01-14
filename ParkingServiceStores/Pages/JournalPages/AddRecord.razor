@@ -1,0 +1,75 @@
+﻿@page "/AddRecord"
+@using ParkingServiceStores.Data;
+@using ParkingServiceStores.Data.Models;
+@using Microsoft.EntityFrameworkCore;
+@inject ApplicationDbContext dbContext;
+@inject NavigationManager NavigationManager;
+@inject IJSRuntime js;
+<h3>Add Journal Record Page</h3>
+@if (cars == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (cars.Count == 0)
+{
+    <p><em>Cars list is empty. You should add car before!</em></p>
+    <button class="btn-primary" @onclick="OnAddCarClicked"> Add new Car</button>
+}
+else
+{
+    <div class="text-left">
+        <form method="post" @onsubmit="OnFormSubmit">
+            <div class="form-group">
+                <label for="inputCar">Select car:</label>
+                <select tabindex="1" id="inputCar" @bind="record.CarId" class="custom-select">
+                    @foreach (var car in cars)
+                    {
+                        <option value="@car.Id">@car.ToString()</option>
+                    }
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="inputEntryTime">Entry time</label>
+                <input @bind-value="record.EntryTime" type="date" class="form-control" id="inputEntryTime" placeholder="Enter entry time">
+            </div>
+            <div class="form-group">
+                <label for="inputOwnerPhone">Leaving time</label>
+                <input @bind-value="record.LeavingTime" type="date" class="form-control" id="inputLeavingTime" placeholder="Enter leaving time">
+            </div>
+            
+            <button class="btn btn-primary">Add record</button>
+        </form>
+    </div>
+}
+@code {
+    List<Car> cars;
+
+    JournalRecord record = new JournalRecord();
+
+    protected override async Task OnInitializedAsync()
+    {
+        cars = await dbContext.Cars.Include(r => r.Owner).ToListAsync();
+        record.CarId = cars.First().Id;
+        record.EntryTime = DateTime.Now;
+        record.LeavingTime = DateTime.Now.AddDays(1);
+            
+    }
+
+    private async void OnFormSubmit()
+    {
+        if (record.LeavingTime <= record.EntryTime)
+        {
+            await js.InvokeVoidAsync("alert", "Leaving time can not be less then Entry time!");
+            return;
+        }
+        await dbContext.Journal.AddAsync(record);
+        await dbContext.SaveChangesAsync();
+        NavigationManager.NavigateTo("/journal");
+    }
+
+    private void OnAddCarClicked()
+    {
+        NavigationManager.NavigateTo("/AddCar");
+    }
+}
+
