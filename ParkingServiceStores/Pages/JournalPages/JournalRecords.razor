@@ -4,6 +4,7 @@
 @using Microsoft.EntityFrameworkCore;
 @inject NavigationManager NavigationManager;
 @inject ApplicationDbContext dbContext;
+@inject IJSRuntime js;
 <h1>List of all journal records:</h1>
 @if (records == null)
 {
@@ -28,11 +29,19 @@ else
         <tbody>
             @foreach (var record in records)
             {
-                <tr>
-                    <td>@record.Car.ToString()</td>
-                    <td>@record.EntryTime</td>
-                    <td>@record.LeavingTime</td>
-                </tr>
+            <tr>
+                <td>@record.Car.ToString()</td>
+                <td>@record.EntryTime</td>
+                <td>@record.LeavingTime</td>
+                <td>
+                    <a class="nav-link" href="/EditRecord/@record.Id">
+                        Edit
+                    </a>
+                    <button class="btn-danger" @onclick="(() => OnDeleteClicked(record))">
+                        Delete
+                    </button>
+                </td>
+            </tr>
             }
         </tbody>
     </table>
@@ -48,5 +57,15 @@ else
     private void OnAddClicked()
     {
         NavigationManager.NavigateTo("/AddRecord");
+    }
+    private async void OnDeleteClicked(JournalRecord record)
+    {
+        bool confirm = await js.InvokeAsync<bool>("confirm", $"Actually delete record ?");
+        if (confirm)
+        {
+            dbContext.Journal.Remove(record);
+            await dbContext.SaveChangesAsync();
+            NavigationManager.NavigateTo("/journal", true);
+        }
     }
 }
