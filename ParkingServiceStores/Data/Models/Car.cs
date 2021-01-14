@@ -20,5 +20,10 @@ namespace ParkingServiceStores.Data.Models
         public ICollection<JournalRecord> JournalRecords { get; set; }
 
         public ICollection<Debt> Debts { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Model} : {PlateNumber}";
+        }
     }
 }

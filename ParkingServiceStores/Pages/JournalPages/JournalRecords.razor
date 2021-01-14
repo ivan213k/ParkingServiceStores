@@ -1,0 +1,51 @@
+﻿@page "/journal"
+@using ParkingServiceStores.Data;
+@using ParkingServiceStores.Data.Models;
+@using Microsoft.EntityFrameworkCore;
+@inject NavigationManager NavigationManager;
+@inject ApplicationDbContext dbContext;
+<h1>List of all journal records:</h1>
+@if (records == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (records.Count == 0)
+{
+    <p><em>Journal is empty. There are no records!</em></p>
+    <button class="btn-primary" @onclick="OnAddClicked"> Add new Record</button>
+}
+else
+{
+    <button class="btn-primary" @onclick="OnAddClicked"> Add new Record</button>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Car</th>
+                <th>Entry time</th>
+                <th>Leaving time</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var record in records)
+            {
+                <tr>
+                    <td>@record.Car.ToString()</td>
+                    <td>@record.EntryTime</td>
+                    <td>@record.LeavingTime</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    List<JournalRecord> records;
+
+    protected override async Task OnInitializedAsync()
+    {
+        records = await dbContext.Journal.Include(r => r.Car).ToListAsync();
+    }
+
+    private void OnAddClicked()
+    {
+    }
+}
