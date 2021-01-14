@@ -1,0 +1,60 @@
+﻿@page "/EditCar/{Id:int}";
+@using ParkingServiceStores.Data;
+@using ParkingServiceStores.Data.Models;
+@using Microsoft.EntityFrameworkCore;
+
+@inject NavigationManager NavigationManager;
+@inject ApplicationDbContext dbContext;
+<h3>Edit Information About Car</h3>
+@if (Car == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="text-left">
+        <form method="post" @onsubmit="OnFormSubmit">
+            <div class="form-group">
+                <label for="inputCarModel">Car Model</label>
+                <input @bind-value="Car.Model" type="text" class="form-control" id="inputCarModel" placeholder="Enter car model">
+            </div>
+            <div class="form-group">
+                <label for="inputPlateNumber">Plate Number</label>
+                <input @bind-value="Car.PlateNumber" type="text" class="form-control" id="inputPlateNumber" placeholder="Enter plate number">
+            </div>
+            <div class="form-group">
+                <label for="inputCarColor">Car Color</label>
+                <input @bind-value="Car.Color" type="text" class="form-control" id="inputCarColor" placeholder="Enter car color">
+            </div>
+            <div class="form-group">
+                <label for="inputOwnerName">Owner's name</label>
+                <input @bind-value="Car.Owner.Name" type="text" class="form-control" id="inputOwnerName" placeholder="Enter owner's name">
+            </div>
+            <div class="form-group">
+                <label for="inputOwnerPhone">Owner's phone number</label>
+                <input @bind-value="Car.Owner.PhoneNumber" type="text" class="form-control" id="inputOwnerPhone" placeholder="Enter owner's phone">
+            </div>
+            <button class="btn btn-primary">Save </button>
+        </form>
+    </div>
+}
+
+@code
+{
+    [Parameter]
+    public int Id { get; set; }
+
+    private Car Car;
+    protected override async Task OnInitializedAsync()
+    {
+        Car = await dbContext.Cars.Include(r => r.Owner).SingleAsync(r => r.Id == Id);
+    }
+
+    private async void OnFormSubmit()
+    {
+        dbContext.Cars.Update(Car);
+
+        await dbContext.SaveChangesAsync();
+        NavigationManager.NavigateTo("/cars");
+    }
+}
