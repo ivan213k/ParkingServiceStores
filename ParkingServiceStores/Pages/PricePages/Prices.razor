@@ -1,0 +1,65 @@
+﻿@page "/prices";
+@inject ApplicationDbContext dbContext;
+@inject NavigationManager NavigationManager;
+@inject IJSRuntime js;
+<h3>List of all prices</h3>
+<p><em>Application, for calculating debt amount, uses last added price (by date) !</em></p>
+@if (prices == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <button class="btn-primary" @onclick="OnAddClicked"> Add new Price</button>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>One day price</th>
+                <th>One hour price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var price in prices)
+            {
+            <tr>
+                <td>@price.Date.ToShortDateString()</td>
+                <td>@price.OneDayPrice.ToString("0.00")</td>
+                <td>@price.OneHourPrice.ToString("0.00")</td>
+                <td>
+                    <button class="btn-danger" @onclick="(() => OnDeleteClicked(price))">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+@code {
+    List<Price> prices;
+
+    protected override async Task OnInitializedAsync()
+    {
+        prices = await dbContext.Prices.OrderByDescending(r=>r.Date).ToListAsync();
+    }
+    private void OnAddClicked()
+    {
+        NavigationManager.NavigateTo("/addPrice");
+    }
+    private async void OnDeleteClicked(Price price)
+    {
+        bool confirm = await js.InvokeAsync<bool>("confirm", $"Actually delete price on date: {price.Date.ToShortDateString()} ?");
+        if (confirm)
+        {
+            if ((await dbContext.Prices.CountAsync()) == 1)
+            {
+                await js.InvokeVoidAsync("alert", "Can not delete last price record!");
+                return;
+            }
+            dbContext.Prices.Remove(price);
+            await dbContext.SaveChangesAsync();
+            NavigationManager.NavigateTo("/prices", true);
+        }
+    }
+}
