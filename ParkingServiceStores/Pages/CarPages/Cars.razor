@@ -77,6 +77,11 @@
         bool confirm = await JS.InvokeAsync<bool>("confirm", $"Actually delete car: {car.Model}: {car.PlateNumber} ?");
         if (confirm)
         {
+            if (await dbContext.Debts.AnyAsync(r=>r.CarId == car.Id && !r.IsPayed))
+            {
+                await JS.InvokeVoidAsync("alert", $"There are active debts on this car. Can not delete!");
+                return;
+            }
             dbContext.Cars.Remove(car);
             await dbContext.SaveChangesAsync();
             NavigationManager.NavigateTo("/cars", true);

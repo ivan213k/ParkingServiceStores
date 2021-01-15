@@ -30,13 +30,12 @@
                     </div>
                     <div class="form-group">
                         <label for="inputEntryTime">Entry time</label>
-                        <input @bind-value="record.EntryTime" type="date" class="form-control" id="inputEntryTime" placeholder="Enter entry time">
+                        <SfDateTimePicker class="form-control" TValue="DateTime" @bind-Value="record.EntryTime" Locale="ru"></SfDateTimePicker>
                     </div>
                     <div class="form-group">
                         <label for="inputOwnerPhone">Leaving time</label>
-                        <input @bind-value="record.LeavingTime" type="date" class="form-control" id="inputLeavingTime" placeholder="Enter leaving time">
+                        <SfDateTimePicker class="form-control" TValue="DateTime" @bind-Value="record.LeavingTime"  Locale="ru"></SfDateTimePicker>
                     </div>
-
                     <button class="btn btn-primary">Add record</button>
                 </form>
             </div>

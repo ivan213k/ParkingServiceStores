@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ParkingServiceStores.Areas.Identity;
 using ParkingServiceStores.Data;
+using Syncfusion.Blazor;
 
 namespace ParkingServiceStores
 {
@@ -33,6 +34,8 @@ namespace ParkingServiceStores
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddSingleton<DebtAmountCalculator>();
+            services.AddSyncfusionBlazor();
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzgzOTkxQDMxMzgyZTM0MmUzMEVxNElNT1RPbHZuKzRqaWtDWjBNWWpxc2t5cWErOWtpZkVLb0NDZ0kxYkk9");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
