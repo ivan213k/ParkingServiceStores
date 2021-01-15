@@ -1,0 +1,69 @@
+﻿@page "/debts";
+@inject ApplicationDbContext dbContext;
+@inject IJSRuntime js;
+@inject NavigationManager NavigationManager;
+<h3>List of all active debts</h3>
+@if (debts == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (debts.Count() == 0)
+{
+    <p><em>Debts list is empty. There are no active debts!</em></p>
+    <h3>Balance: <b style="background-color:lightgreen">@balance.ToString("0.00")</b></h3>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Car</th>
+                <th>Debt amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var debt in debts)
+            {
+                <tr>
+                    <td>@debt.Car.ToString()</td>
+                    <td>@debt.DebtAmount.ToString("0.00")</td>
+                    <td>
+                        <button class="btn-primary" @onclick="(() => OnPayClicked(debt))">Pay</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (balance < 0)
+    {
+        <h3>Balance: <b style="background-color:pink">@balance.ToString("0.00")</b></h3>
+    }
+    else
+    {
+        <h3>Balance: <b style="background-color:lightgreen">@balance.ToString("0.00")</b></h3>
+    }
+}
+@code {
+    private List<Debt> debts;
+
+    private decimal balance = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        debts = await dbContext.Debts.Include(r => r.Car).Where(r => !r.IsPayed).OrderByDescending(r => r.Id).ToListAsync();
+        balance -= debts.Sum(r => r.DebtAmount);
+    }
+    private async void OnPayClicked(Debt debt)
+    {
+        bool confirm = await js.InvokeAsync<bool>("confirm", $"Actually pay {debt.DebtAmount} ?");
+        if (true)
+        {
+            debt.IsPayed = true;
+            dbContext.Debts.Update(debt);
+            await dbContext.SaveChangesAsync();
+            await js.InvokeVoidAsync("alert", "Payed successfully !");
+            NavigationManager.NavigateTo("/debts",true);
+        }
+    }
+
+}

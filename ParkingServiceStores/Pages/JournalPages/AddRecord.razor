@@ -63,13 +63,18 @@ else
             await js.InvokeVoidAsync("alert", "Leaving time can not be less then Entry time!");
             return;
         }
+        Price lastPrice = await dbContext.Prices.OrderBy(r => r.Date).LastOrDefaultAsync();
+        if (lastPrice == null)
+        {
+            await js.InvokeVoidAsync("alert", "Price list is empty! Add price in Administration menu, before.");
+            return;
+        }
         await dbContext.Journal.AddAsync(record);
         await dbContext.SaveChangesAsync();
 
         Debt debt = new Debt();
         debt.CarId = record.CarId;
         TimeSpan period = record.LeavingTime - record.EntryTime;
-        Price lastPrice = await dbContext.Prices.OrderBy(r => r.Date).LastAsync();
         debt.DebtAmount = DebtAmountCalculator.CalculateDebtAmount(period,lastPrice);
         await dbContext.Debts.AddAsync(debt);
         await dbContext.SaveChangesAsync();

@@ -51,7 +51,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        records = await dbContext.Journal.Include(r => r.Car).ToListAsync();
+        records = await dbContext.Journal.Include(r => r.Car).OrderByDescending(r=>r.Id).ToListAsync();
     }
 
     private void OnAddClicked()

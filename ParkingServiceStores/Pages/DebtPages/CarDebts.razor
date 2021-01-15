@@ -36,7 +36,7 @@ else
             {
                 <tr>
                     <td>@debt.DebtAmount.ToString("0.00")</td>
-                    <td>@(debt.IsPayed ? "Yeas" : "No")</td>
+                    <td>@(debt.IsPayed ? "Yes" : "No")</td>
                 </tr>
             }
         </tbody>
@@ -56,7 +56,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        debts = await dbContext.Debts.Where(r => r.CarId == CarId).ToListAsync();
+        debts = await dbContext.Debts.Where(r => r.CarId == CarId).OrderByDescending(r=>r.Id).ToListAsync();
         car = await dbContext.Cars.SingleAsync(r => r.Id == CarId);
     }
     private void BackToCarsClicked()
