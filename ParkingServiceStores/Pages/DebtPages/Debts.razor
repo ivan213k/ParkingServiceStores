@@ -2,47 +2,55 @@
 @inject ApplicationDbContext dbContext;
 @inject IJSRuntime js;
 @inject NavigationManager NavigationManager;
-<h3>List of all active debts</h3>
-@if (debts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else if (debts.Count() == 0)
-{
-    <p><em>Debts list is empty. There are no active debts!</em></p>
-    <h3>Balance: <b style="background-color:lightgreen">@balance.ToString("0.00")</b></h3>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Car</th>
-                <th>Debt amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var debt in debts)
+<AuthorizeView>
+    <Authorized>
+        <h3>List of all active debts</h3>
+        @if (debts == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else if (debts.Count() == 0)
+        {
+            <p><em>Debts list is empty. There are no active debts!</em></p>
+            <h3>Balance: <b style="background-color:lightgreen">@balance.ToString("0.00")</b></h3>
+        }
+        else
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Car</th>
+                        <th>Debt amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var debt in debts)
+                    {
+                        <tr>
+                            <td>@debt.Car.ToString()</td>
+                            <td>@debt.DebtAmount.ToString("0.00")</td>
+                            <td>
+                                <button class="btn-primary" @onclick="(() => OnPayClicked(debt))">Pay</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (balance < 0)
             {
-                <tr>
-                    <td>@debt.Car.ToString()</td>
-                    <td>@debt.DebtAmount.ToString("0.00")</td>
-                    <td>
-                        <button class="btn-primary" @onclick="(() => OnPayClicked(debt))">Pay</button>
-                    </td>
-                </tr>
+                <h3>Balance: <b style="background-color:pink">@balance.ToString("0.00")</b></h3>
             }
-        </tbody>
-    </table>
-    @if (balance < 0)
-    {
-        <h3>Balance: <b style="background-color:pink">@balance.ToString("0.00")</b></h3>
-    }
-    else
-    {
-        <h3>Balance: <b style="background-color:lightgreen">@balance.ToString("0.00")</b></h3>
-    }
-}
+            else
+            {
+                <h3>Balance: <b style="background-color:lightgreen">@balance.ToString("0.00")</b></h3>
+            }
+        }
+    </Authorized>
+    <NotAuthorized>
+        <NotAuthorizedMessage/>
+    </NotAuthorized>
+</AuthorizeView>
+
 @code {
     private List<Debt> debts;
 

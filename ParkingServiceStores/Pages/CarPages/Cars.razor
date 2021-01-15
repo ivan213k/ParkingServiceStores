@@ -1,62 +1,66 @@
 ﻿@page "/cars";
-@using ParkingServiceStores.Data;
-@using Microsoft.EntityFrameworkCore;
-@using ParkingServiceStores.Data.Models;
 
 @inject ApplicationDbContext dbContext;
 @inject NavigationManager NavigationManager;
 @inject IJSRuntime JS;
-<h1>List of all cars: !</h1>
+<AuthorizeView>
+    <Authorized>
+        <h1>List of all cars: !</h1>
 
-@if (cars == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <button class="btn-primary" @onclick="OnAddClicked"> Add new Car</button>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Model</th>
-                <th>Color</th>
-                <th>Plate Number</th>
-                <th>Owner's name</th>
-                <th>Owner's phone</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var car in cars)
-            {
-                <tr>
-                    <td>@car.Model</td>
-                    <td>@car.Color</td>
-                    <td>@car.PlateNumber</td>
-                    <td>@car.Owner.Name</td>
-                    <td>@car.Owner.PhoneNumber</td>
-                    <td>
-                        <div class="row">
-                            <div class="col-sm-auto" >
-                                <a class="nav-link" href="/EditCar/@car.Id">
-                                    Edit
-                                </a>
-                            </div>
-                            <div class="col-sm-auto">
-                                <a class="nav-link" href="/CarDebts/@car.Id">
-                                    View debts
-                                </a>
-                            </div>
-                        </div>
-                        
-                        <button class="btn-danger" @onclick="(() => OnDeleteClicked(car))">
-                            Delete
-                        </button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+        @if (cars == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <button class="btn-primary" @onclick="OnAddClicked"> Add new Car</button>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Color</th>
+                        <th>Plate Number</th>
+                        <th>Owner's name</th>
+                        <th>Owner's phone</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var car in cars)
+                    {
+                        <tr>
+                            <td>@car.Model</td>
+                            <td>@car.Color</td>
+                            <td>@car.PlateNumber</td>
+                            <td>@car.Owner.Name</td>
+                            <td>@car.Owner.PhoneNumber</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-sm-auto">
+                                        <a class="nav-link" href="/EditCar/@car.Id">
+                                            Edit
+                                        </a>
+                                    </div>
+                                    <div class="col-sm-auto">
+                                        <a class="nav-link" href="/CarDebts/@car.Id">
+                                            View debts
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <button class="btn-danger" @onclick="(() => OnDeleteClicked(car))">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </Authorized>
+    <NotAuthorized>
+       <NotAuthorizedMessage/>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code{
     List<Car> cars;
@@ -66,7 +70,7 @@ else
     }
     private void OnAddClicked()
     {
-        NavigationManager.NavigateTo("AddCar");
+        NavigationManager.NavigateTo("/AddCar");
     }
     private async void OnDeleteClicked(Car car)
     {

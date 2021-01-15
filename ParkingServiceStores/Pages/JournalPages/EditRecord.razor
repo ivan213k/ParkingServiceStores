@@ -1,43 +1,47 @@
 ﻿@page "/EditRecord/{Id:int}";
-@using ParkingServiceStores.Data;
-@using ParkingServiceStores.Data.Models;
-@using Microsoft.EntityFrameworkCore;
-
 @inject NavigationManager NavigationManager;
 @inject ApplicationDbContext dbContext;
 @inject IJSRuntime js;
-<h3>Edit Information About Record</h3>
+<AuthorizeView>
+    <Authorized>
+        <h3>Edit Information About Record</h3>
 
-@if (cars == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <div class="text-left">
-        <form method="post" @onsubmit="OnFormSubmit">
-            <div class="form-group">
-                <label for="inputCar">Select car:</label>
-                <select tabindex="1" id="inputCar" @bind="record.CarId" class="custom-select">
-                    @foreach (var car in cars)
-                    {
-                        <option value="@car.Id">@car.ToString()</option>
-                    }
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="inputEntryTime">Entry time</label>
-                <input @bind-value="record.EntryTime" type="date" class="form-control" id="inputEntryTime" placeholder="Enter entry time">
-            </div>
-            <div class="form-group">
-                <label for="inputOwnerPhone">Leaving time</label>
-                <input @bind-value="record.LeavingTime" type="date" class="form-control" id="inputLeavingTime" placeholder="Enter leaving time">
-            </div>
+        @if (cars == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <div class="text-left">
+                <form method="post" @onsubmit="OnFormSubmit">
+                    <div class="form-group">
+                        <label for="inputCar">Select car:</label>
+                        <select tabindex="1" id="inputCar" @bind="record.CarId" class="custom-select">
+                            @foreach (var car in cars)
+                            {
+                                <option value="@car.Id">@car.ToString()</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputEntryTime">Entry time</label>
+                        <input @bind-value="record.EntryTime" type="date" class="form-control" id="inputEntryTime" placeholder="Enter entry time">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputOwnerPhone">Leaving time</label>
+                        <input @bind-value="record.LeavingTime" type="date" class="form-control" id="inputLeavingTime" placeholder="Enter leaving time">
+                    </div>
 
-            <button class="btn btn-primary">Save</button>
-        </form>
-    </div>
-}
+                    <button class="btn btn-primary">Save</button>
+                </form>
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <NotAuthorizedMessage/>
+    </NotAuthorized>
+</AuthorizeView>
+
 @code {
     [Parameter]
     public int Id { get; set; }

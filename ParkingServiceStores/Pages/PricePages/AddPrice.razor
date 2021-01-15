@@ -1,25 +1,33 @@
 ﻿@page "/addPrice";
 @inject ApplicationDbContext dbContext;
 @inject NavigationManager NavigationManager;
-<h3>Add new price form</h3>
-<div class="text-left">
-    <EditForm Model="price" OnValidSubmit="OnFormSubmit">
-        <div class="form-group">
-            <label for="inputOneDayPrice">One day price</label>
-            <input @bind-value="price.OneDayPrice" type="number" min="0" class="form-control" id="inputOneDayPrice" placeholder="Enter one day price">
-        </div>
-        <div class="form-group">
-            <label for="inputOneHourPrice">One hour price</label>
-            <input @bind-value="price.OneHourPrice" type="number" min="0" class="form-control" id="inputOneHourPrice" placeholder="Enter one hour price">
-        </div>
-        <div class="form-group">
-            <label for="inputDate">Date</label>
-            <input @bind-value="price.Date" type="date" class="form-control" id="inputDate" placeholder="Enter Date">
-        </div>
+<AuthorizeView>
+    <Authorized Context="Auth">
+        <h3>Add new price form</h3>
+        <div class="text-left">
+            <EditForm Model="price" OnValidSubmit="OnFormSubmit">
+                <div class="form-group">
+                    <label for="inputOneDayPrice">One day price</label>
+                    <input @bind-value="price.OneDayPrice" type="number" min="0" class="form-control" id="inputOneDayPrice" placeholder="Enter one day price">
+                </div>
+                <div class="form-group">
+                    <label for="inputOneHourPrice">One hour price</label>
+                    <input @bind-value="price.OneHourPrice" type="number" min="0" class="form-control" id="inputOneHourPrice" placeholder="Enter one hour price">
+                </div>
+                <div class="form-group">
+                    <label for="inputDate">Date</label>
+                    <input @bind-value="price.Date" type="date" class="form-control" id="inputDate" placeholder="Enter Date">
+                </div>
 
-        <button class="btn btn-primary">Add new price</button>
-    </EditForm>
-</div>
+                <button class="btn btn-primary">Add new price</button>
+            </EditForm>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <NotAuthorizedMessage/>
+    </NotAuthorized>
+</AuthorizeView>
+
 @code {
     private Price price = new Price();
     public AddPrice()

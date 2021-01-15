@@ -2,40 +2,48 @@
 @inject ApplicationDbContext dbContext;
 @inject NavigationManager NavigationManager;
 @inject IJSRuntime js;
-<h3>List of all prices</h3>
-<p><em>Application, for calculating debt amount, uses last added price (by date) !</em></p>
-@if (prices == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <button class="btn-primary" @onclick="OnAddClicked"> Add new Price</button>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>One day price</th>
-                <th>One hour price</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var price in prices)
-            {
-            <tr>
-                <td>@price.Date.ToShortDateString()</td>
-                <td>@price.OneDayPrice.ToString("0.00")</td>
-                <td>@price.OneHourPrice.ToString("0.00")</td>
-                <td>
-                    <button class="btn-danger" @onclick="(() => OnDeleteClicked(price))">
-                        Delete
-                    </button>
-                </td>
-            </tr>
-            }
-        </tbody>
-    </table>
-}
+<AuthorizeView>
+    <Authorized>
+        <h3>List of all prices</h3>
+        <p><em>Application, for calculating debt amount, uses last added price (by date) !</em></p>
+        @if (prices == null)
+        {
+            <p><em>Loading...</em></p>
+        }
+        else
+        {
+            <button class="btn-primary" @onclick="OnAddClicked"> Add new Price</button>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>One day price</th>
+                        <th>One hour price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var price in prices)
+                    {
+                        <tr>
+                            <td>@price.Date.ToShortDateString()</td>
+                            <td>@price.OneDayPrice.ToString("0.00")</td>
+                            <td>@price.OneHourPrice.ToString("0.00")</td>
+                            <td>
+                                <button class="btn-danger" @onclick="(() => OnDeleteClicked(price))">
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <NotAuthorizedMessage/>
+    </NotAuthorized>
+</AuthorizeView>
+
 @code {
     List<Price> prices;
 
