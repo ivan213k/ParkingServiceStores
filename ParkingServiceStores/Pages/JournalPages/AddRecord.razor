@@ -55,8 +55,8 @@
     {
         cars = await dbContext.Cars.Include(r => r.Owner).ToListAsync();
         record.CarId = cars.First().Id;
-        record.EntryTime = DateTime.Now;
-        record.LeavingTime = DateTime.Now.AddDays(1);
+        record.EntryTime = new DateTime(DateTime.Now.Year,DateTime.Now.Month,DateTime.Now.Day,DateTime.Now.Hour,0,0);
+        record.LeavingTime = record.EntryTime.AddDays(1);
 
     }
 
