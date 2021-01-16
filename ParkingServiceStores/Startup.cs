@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -8,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ParkingServiceStores.Areas.Identity;
 using ParkingServiceStores.Data;
+using ParkingServiceStores.Data.DTOModels;
+using ParkingServiceStores.Data.Models;
 using Syncfusion.Blazor;
 
 namespace ParkingServiceStores
@@ -34,6 +37,11 @@ namespace ParkingServiceStores
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddSingleton<DebtAmountCalculator>();
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<CarDto, Car>()
+                    .ForPath(c => c.Owner.Name, opt => opt.MapFrom(c => c.OwnerName))
+                    .ForPath(c => c.Owner.PhoneNumber, opt => opt.MapFrom(c => c.OwnerPhoneNumber))
+                    .ForPath(c=>c.Owner.Id, opt=>opt.MapFrom(c=>c.OwnerId)).ReverseMap());
+            services.AddSingleton(config.CreateMapper());
             services.AddSyncfusionBlazor();
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzgzOTkxQDMxMzgyZTM0MmUzMEVxNElNT1RPbHZuKzRqaWtDWjBNWWpxc2t5cWErOWtpZkVLb0NDZ0kxYkk9");
         }

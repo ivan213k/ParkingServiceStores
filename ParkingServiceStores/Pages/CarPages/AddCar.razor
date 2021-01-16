@@ -1,51 +1,51 @@
 ﻿@page "/AddCar"
 @inject ApplicationDbContext dbContext;
 @inject NavigationManager NavigationManager;
+@inject IMapper mapper;
 <AuthorizeView>
-    <Authorized>
+    <Authorized Context="Auth">
         <h3>Add Car Page</h3>
         <div class="text-left">
-            <form method="post" @onsubmit="OnFormSubmit">
+            <EditForm Model="@carDto" OnValidSubmit="@OnFormSubmit">
+                <DataAnnotationsValidator />
                 <div class="form-group">
                     <label for="inputCarModel">Car Model</label>
-                    <input @bind-value="Car.Model" type="text" class="form-control" id="inputCarModel" placeholder="Enter car model">
+                    <InputText id="inputCarModel" @bind-Value="carDto.Model" class="form-control" placeholder="Enter car model" />
                 </div>
                 <div class="form-group">
                     <label for="inputPlateNumber">Plate Number</label>
-                    <input @bind-value="Car.PlateNumber" type="text" class="form-control" id="inputPlateNumber" placeholder="Enter plate number">
+                    <InputText @bind-Value="carDto.PlateNumber" class="form-control" id="inputPlateNumber" placeholder="Enter plate number" />
                 </div>
                 <div class="form-group">
                     <label for="inputCarColor">Car Color</label>
-                    <input @bind-value="Car.Color" type="text" class="form-control" id="inputCarColor" placeholder="Enter car color">
+                    <InputText @bind-Value="carDto.Color" class="form-control" id="inputCarColor" placeholder="Enter car color" />
                 </div>
                 <div class="form-group">
                     <label for="inputOwnerName">Owner's name</label>
-                    <input @bind-value="Car.Owner.Name" type="text" class="form-control" id="inputOwnerName" placeholder="Enter owner's name">
+                    <InputText @bind-Value="carDto.OwnerName" class="form-control" id="inputOwnerName" placeholder="Enter owner's name" />
                 </div>
                 <div class="form-group">
                     <label for="inputOwnerPhone">Owner's phone number</label>
-                    <input @bind-value="Car.Owner.PhoneNumber" type="text" class="form-control" id="inputOwnerPhone" placeholder="Enter owner's phone">
+                    <InputText @bind-Value="carDto.OwnerPhoneNumber" class="form-control" id="inputOwnerPhone" placeholder="Enter owner's phone" />
                 </div>
+                <ValidationSummary />
                 <button class="btn btn-primary">Add car</button>
-            </form>
+            </EditForm>
         </div>
     </Authorized>
     <NotAuthorized>
-        <NotAuthorizedMessage/>
+        <NotAuthorizedMessage />
     </NotAuthorized>
 </AuthorizeView>
 
 @code {
-    private Car Car = new Car();
-
-    public AddCar()
-    {
-        Car.Owner = new CarOwner();
-    }
+    private CarDto carDto = new CarDto();
 
     private async void OnFormSubmit()
     {
-        await dbContext.Cars.AddAsync(Car);
+        Car car = mapper.Map<CarDto, Car>(carDto);
+
+        await dbContext.Cars.AddAsync(car);
 
         await dbContext.SaveChangesAsync();
         NavigationManager.NavigateTo("/cars");
