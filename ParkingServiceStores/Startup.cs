@@ -11,6 +11,7 @@ using ParkingServiceStores.Areas.Identity;
 using ParkingServiceStores.Data;
 using ParkingServiceStores.Data.DTOModels;
 using ParkingServiceStores.Data.Models;
+using ParkingServiceStores.Data.Repositories;
 using Syncfusion.Blazor;
 
 namespace ParkingServiceStores
@@ -44,6 +45,10 @@ namespace ParkingServiceStores
             services.AddSingleton(config.CreateMapper());
             services.AddSyncfusionBlazor();
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzgzOTkxQDMxMzgyZTM0MmUzMEVxNElNT1RPbHZuKzRqaWtDWjBNWWpxc2t5cWErOWtpZkVLb0NDZ0kxYkk9");
+            services.AddTransient<IRepository<Car>, CarRepository>();
+            services.AddTransient<IRepository<Debt>, DebtRepository>();
+            services.AddTransient<IRepository<Price>, PriceRepository>();
+            services.AddTransient<IRepository<JournalRecord>, JournalRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

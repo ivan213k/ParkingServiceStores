@@ -1,6 +1,7 @@
 ﻿@page "/EditRecord/{Id:int}";
 @inject NavigationManager NavigationManager;
-@inject ApplicationDbContext dbContext;
+@inject IRepository<JournalRecord> JournalRepository;
+@inject IRepository<Car> CarRepository;
 @inject IJSRuntime js;
 <AuthorizeView>
     <Authorized>
@@ -31,14 +32,13 @@
                         <label for="inputOwnerPhone">Leaving time</label>
                         <SfDateTimePicker class="form-control" TValue="DateTime" @bind-Value="record.LeavingTime" Locale="ru"></SfDateTimePicker>
                     </div>
-
                     <button class="btn btn-primary">Save</button>
                 </form>
             </div>
         }
     </Authorized>
     <NotAuthorized>
-        <NotAuthorizedMessage/>
+        <NotAuthorizedMessage />
     </NotAuthorized>
 </AuthorizeView>
 
@@ -46,15 +46,14 @@
     [Parameter]
     public int Id { get; set; }
 
-    List<Car> cars;
+    IEnumerable<Car> cars;
 
     JournalRecord record;
 
     protected override async Task OnInitializedAsync()
     {
-        cars = await dbContext.Cars.Include(r => r.Owner).ToListAsync();
-        record = await dbContext.Journal.SingleAsync(r => r.Id == Id);
-
+        cars = await CarRepository.GetAllAsync();
+        record = await JournalRepository.GetByIdAsync(Id);
     }
 
     private async void OnFormSubmit()
@@ -64,8 +63,7 @@
             await js.InvokeVoidAsync("alert", "Leaving time can not be less then Entry time!");
             return;
         }
-        dbContext.Journal.Update(record);
-        await dbContext.SaveChangesAsync();
+        await JournalRepository.UpdateAsync(record);
         NavigationManager.NavigateTo("/journal");
     }
 

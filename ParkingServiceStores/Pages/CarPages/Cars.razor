@@ -1,8 +1,8 @@
 ﻿@page "/cars";
-
-@inject ApplicationDbContext dbContext;
 @inject NavigationManager NavigationManager;
 @inject IJSRuntime JS;
+@inject IRepository<Car> CarRepository;
+@inject IRepository<Debt> DebtRepository;
 <AuthorizeView>
     <Authorized>
         <h1>List of all cars: !</h1>
@@ -63,10 +63,10 @@
 </AuthorizeView>
 
 @code{
-    List<Car> cars;
+    IEnumerable<Car> cars;
     protected override async Task OnInitializedAsync()
     {
-        cars = await dbContext.Cars.Include(r => r.Owner).ToListAsync();
+        cars = await CarRepository.GetAllAsync();
     }
     private void OnAddClicked()
     {
@@ -77,13 +77,13 @@
         bool confirm = await JS.InvokeAsync<bool>("confirm", $"Actually delete car: {car.Model}: {car.PlateNumber} ?");
         if (confirm)
         {
-            if (await dbContext.Debts.AnyAsync(r=>r.CarId == car.Id && !r.IsPayed))
+            if ((await DebtRepository.FindAsync(r=>r.CarId == car.Id && !r.IsPayed)).Any())
             {
                 await JS.InvokeVoidAsync("alert", $"There are active debts on this car. Can not delete!");
                 return;
             }
-            dbContext.Cars.Remove(car);
-            await dbContext.SaveChangesAsync();
+            await CarRepository.DeleteAsync(car);
+
             NavigationManager.NavigateTo("/cars", true);
         }
     }

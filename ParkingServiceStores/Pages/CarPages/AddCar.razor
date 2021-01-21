@@ -1,7 +1,7 @@
 ﻿@page "/AddCar"
-@inject ApplicationDbContext dbContext;
 @inject NavigationManager NavigationManager;
 @inject IMapper mapper;
+@inject IRepository<Car> CarRepository;
 <AuthorizeView>
     <Authorized Context="Auth">
         <h3>Add Car Page</h3>
@@ -43,11 +43,11 @@
 
     private async void OnFormSubmit()
     {
+        carDto.CreatedOn = DateTime.Now.ToUniversalTime();
         Car car = mapper.Map<CarDto, Car>(carDto);
 
-        await dbContext.Cars.AddAsync(car);
+        await CarRepository.AddAsync(car);
 
-        await dbContext.SaveChangesAsync();
         NavigationManager.NavigateTo("/cars");
     }
 }

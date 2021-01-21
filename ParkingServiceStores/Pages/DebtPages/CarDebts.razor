@@ -1,5 +1,5 @@
 ﻿@page "/CarDebts/{CarId:int}";
-@inject ApplicationDbContext dbContext;
+@inject IRepository<Debt> DebtRepository;
 @inject NavigationManager NavigationManager;
 <AuthorizeView>
     <Authorized>
@@ -59,8 +59,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        debts = await dbContext.Debts.Where(r => r.CarId == CarId).OrderByDescending(r=>r.Id).ToListAsync();
-        car = await dbContext.Cars.SingleAsync(r => r.Id == CarId);
+        debts = (await DebtRepository.FindAsync(r => r.CarId == CarId)).OrderByDescending(r=>r.Id).ToList();
+        car = debts.FirstOrDefault().Car;
     }
     private void BackToCarsClicked()
     {

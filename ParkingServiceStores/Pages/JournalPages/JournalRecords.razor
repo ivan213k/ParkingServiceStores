@@ -1,6 +1,6 @@
 ﻿@page "/journal"
+@inject IRepository<JournalRecord> JournalRepository;
 @inject NavigationManager NavigationManager;
-@inject ApplicationDbContext dbContext;
 @inject IJSRuntime js;
 <AuthorizeView>
     <Authorized>
@@ -47,7 +47,7 @@
         }
     </Authorized>
     <NotAuthorized>
-        <NotAuthorizedMessage/>
+        <NotAuthorizedMessage />
     </NotAuthorized>
 </AuthorizeView>
 
@@ -56,7 +56,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        records = await dbContext.Journal.Include(r => r.Car).OrderByDescending(r=>r.Id).ToListAsync();
+        records = (await JournalRepository.GetAllAsync()).OrderByDescending(r => r.Id).ToList();
     }
 
     private void OnAddClicked()
@@ -68,8 +68,7 @@
         bool confirm = await js.InvokeAsync<bool>("confirm", $"Actually delete record ?");
         if (confirm)
         {
-            dbContext.Journal.Remove(record);
-            await dbContext.SaveChangesAsync();
+            await JournalRepository.DeleteAsync(record);
             NavigationManager.NavigateTo("/journal", true);
         }
     }

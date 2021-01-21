@@ -1,11 +1,11 @@
 ﻿@page "/EditCar/{Id:int}";
 @inject NavigationManager NavigationManager;
-@inject ApplicationDbContext dbContext;
 @inject IMapper mapper; 
+@inject IRepository<Car> CarRepository; 
 <AuthorizeView>
     <Authorized Context="Auth">
         <h3>Edit Information About Car</h3>
-        @if (Car == null)
+        @if (carDto == null)
         {
             <p><em>Loading...</em></p>
         }
@@ -50,20 +50,19 @@
     [Parameter]
     public int Id { get; set; }
 
-    private Car Car;
+    private Car car;
     private CarDto carDto;
     protected override async Task OnInitializedAsync()
     {
-        Car = await dbContext.Cars.Include(r => r.Owner).SingleAsync(r => r.Id == Id);
-        carDto = mapper.Map<Car, CarDto>(Car);
+        car = await CarRepository.GetByIdAsync(Id);
+        carDto = mapper.Map<Car, CarDto>(car);
     }
 
     private async void OnFormSubmit()
     {
-        mapper.Map<CarDto, Car>(carDto, Car);
-        dbContext.Cars.Update(Car);
+        mapper.Map<CarDto, Car>(carDto, car);
+        await CarRepository.UpdateAsync(car);
 
-        await dbContext.SaveChangesAsync();
         NavigationManager.NavigateTo("/cars");
     }
 }

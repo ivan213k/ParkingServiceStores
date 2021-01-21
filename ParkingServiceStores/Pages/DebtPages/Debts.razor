@@ -1,7 +1,7 @@
 ﻿@page "/debts";
-@inject ApplicationDbContext dbContext;
 @inject IJSRuntime js;
 @inject NavigationManager NavigationManager;
+@inject IRepository<Debt> DebtRepository;
 <AuthorizeView>
     <Authorized>
         <h3>List of all active debts</h3>
@@ -58,7 +58,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        debts = await dbContext.Debts.Include(r => r.Car).Where(r => !r.IsPayed).OrderByDescending(r => r.Id).ToListAsync();
+        debts = (await DebtRepository.FindAsync(r => !r.IsPayed)).OrderByDescending(r=>r.Id).ToList();
         balance -= debts.Sum(r => r.DebtAmount);
     }
     private async void OnPayClicked(Debt debt)
@@ -67,8 +67,7 @@
         if (confirm)
         {
             debt.IsPayed = true;
-            dbContext.Debts.Update(debt);
-            await dbContext.SaveChangesAsync();
+            await DebtRepository.UpdateAsync(debt);
             await js.InvokeVoidAsync("alert", "Payed successfully !");
             NavigationManager.NavigateTo("/debts",true);
         }

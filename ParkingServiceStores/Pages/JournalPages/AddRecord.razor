@@ -1,5 +1,8 @@
 ﻿@page "/AddRecord"
-@inject ApplicationDbContext dbContext;
+@inject IRepository<JournalRecord> JournalRepository;
+@inject IRepository<Car> CarRepository;
+@inject IRepository<Price> PriceRepository;
+@inject IRepository<Debt> DebtRepository;
 @inject DebtAmountCalculator DebtAmountCalculator;
 @inject NavigationManager NavigationManager;
 @inject IJSRuntime js;
@@ -34,7 +37,7 @@
                     </div>
                     <div class="form-group">
                         <label for="inputOwnerPhone">Leaving time</label>
-                        <SfDateTimePicker class="form-control" TValue="DateTime" @bind-Value="record.LeavingTime"  Locale="ru"></SfDateTimePicker>
+                        <SfDateTimePicker class="form-control" TValue="DateTime" @bind-Value="record.LeavingTime" Locale="ru"></SfDateTimePicker>
                     </div>
                     <button class="btn btn-primary">Add record</button>
                 </form>
@@ -42,7 +45,7 @@
         }
     </Authorized>
     <NotAuthorized>
-        <NotAuthorizedMessage/>
+        <NotAuthorizedMessage />
     </NotAuthorized>
 </AuthorizeView>
 
@@ -53,9 +56,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        cars = await dbContext.Cars.Include(r => r.Owner).ToListAsync();
+        cars = (await CarRepository.GetAllAsync()).ToList();
         record.CarId = cars.First().Id;
-        record.EntryTime = new DateTime(DateTime.Now.Year,DateTime.Now.Month,DateTime.Now.Day,DateTime.Now.Hour,0,0);
+        record.EntryTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, DateTime.Now.Hour, 0, 0);
         record.LeavingTime = record.EntryTime.AddDays(1);
 
     }
@@ -67,21 +70,19 @@
             await js.InvokeVoidAsync("alert", "Leaving time can not be less then Entry time!");
             return;
         }
-        Price lastPrice = await dbContext.Prices.OrderBy(r => r.Date).LastOrDefaultAsync();
+        Price lastPrice = (await PriceRepository.GetAllAsync()).OrderBy(r => r.Date).LastOrDefault();
         if (lastPrice == null)
         {
             await js.InvokeVoidAsync("alert", "Price list is empty! Add price in Administration menu, before.");
             return;
         }
-        await dbContext.Journal.AddAsync(record);
-        await dbContext.SaveChangesAsync();
+        await JournalRepository.AddAsync(record);
 
         Debt debt = new Debt();
         debt.CarId = record.CarId;
         TimeSpan period = record.LeavingTime - record.EntryTime;
-        debt.DebtAmount = DebtAmountCalculator.CalculateDebtAmount(period,lastPrice);
-        await dbContext.Debts.AddAsync(debt);
-        await dbContext.SaveChangesAsync();
+        debt.DebtAmount = DebtAmountCalculator.CalculateDebtAmount(period, lastPrice);
+        await DebtRepository.AddAsync(debt);
         NavigationManager.NavigateTo("/journal");
     }
 

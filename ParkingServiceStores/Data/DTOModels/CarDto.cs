@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ParkingServiceStores.Data.DTOModels
 {
@@ -24,6 +25,8 @@ namespace ParkingServiceStores.Data.DTOModels
         [Required]
         [RegularExpression(@"^[0-9\-\+]{9,15}$", ErrorMessage = "Phone format is not correct")]
         public string OwnerPhoneNumber { get; set; }
+
+        public DateTime CreatedOn { get; set; }
 
         public int OwnerId { get; set; }
     }

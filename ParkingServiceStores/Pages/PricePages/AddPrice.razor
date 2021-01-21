@@ -1,5 +1,5 @@
 ﻿@page "/addPrice";
-@inject ApplicationDbContext dbContext;
+@inject IRepository<Price> PriceRepository;
 @inject NavigationManager NavigationManager;
 <AuthorizeView>
     <Authorized Context="Auth">
@@ -36,8 +36,7 @@
     }
     private async void OnFormSubmit()
     {
-        await dbContext.Prices.AddAsync(price);
-        await dbContext.SaveChangesAsync();
+        await PriceRepository.AddAsync(price);
         NavigationManager.NavigateTo("/prices");
     }
 }

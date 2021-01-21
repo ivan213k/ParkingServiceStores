@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace ParkingServiceStores.Data.Models
@@ -14,6 +15,8 @@ namespace ParkingServiceStores.Data.Models
         public string Model { get; set; }
 
         public string Color { get; set; }
+
+        public DateTime CreatedOn { get; set; }
 
         public CarOwner Owner { get; set; }
 

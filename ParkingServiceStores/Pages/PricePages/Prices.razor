@@ -1,5 +1,5 @@
 ﻿@page "/prices";
-@inject ApplicationDbContext dbContext;
+@inject IRepository<Price> PriceRepository;
 @inject NavigationManager NavigationManager;
 @inject IJSRuntime js;
 <AuthorizeView>
@@ -49,7 +49,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        prices = await dbContext.Prices.OrderByDescending(r=>r.Date).ToListAsync();
+        prices = (await PriceRepository.GetAllAsync()).OrderByDescending(r=>r.Date).ToList();
     }
     private void OnAddClicked()
     {
@@ -60,13 +60,12 @@
         bool confirm = await js.InvokeAsync<bool>("confirm", $"Actually delete price on date: {price.Date.ToShortDateString()} ?");
         if (confirm)
         {
-            if ((await dbContext.Prices.CountAsync()) == 1)
+            if (prices.Count() == 1)
             {
                 await js.InvokeVoidAsync("alert", "Can not delete last price record!");
                 return;
             }
-            dbContext.Prices.Remove(price);
-            await dbContext.SaveChangesAsync();
+            await PriceRepository.DeleteAsync(price);
             NavigationManager.NavigateTo("/prices", true);
         }
     }
