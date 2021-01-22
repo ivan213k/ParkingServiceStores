@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace ParkingServiceStores.Data.Models
 {
-    public class Car
+    public class Car : BaseEntity
     {
         [Key]
         public int Id { get; set; }
@@ -15,8 +14,6 @@ namespace ParkingServiceStores.Data.Models
         public string Model { get; set; }
 
         public string Color { get; set; }
-
-        public DateTime CreatedOn { get; set; }
 
         public CarOwner Owner { get; set; }
 

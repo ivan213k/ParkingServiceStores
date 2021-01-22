@@ -58,7 +58,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        debts = (await DebtRepository.FindAsync(r => !r.IsPayed)).OrderByDescending(r=>r.Id).ToList();
+        debts = (await DebtRepository.FindAsync(r => !r.IsPayed)).OrderByDescending(r=>r.CreatedOn).ToList();
         balance -= debts.Sum(r => r.DebtAmount);
     }
     private async void OnPayClicked(Debt debt)

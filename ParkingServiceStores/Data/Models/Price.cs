@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ParkingServiceStores.Data.Models
 {
-    public class Price
+    public class Price : BaseEntity
     {
         public Price()
         {

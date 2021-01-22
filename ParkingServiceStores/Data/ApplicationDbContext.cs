@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using ParkingServiceStores.Data.Models;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ParkingServiceStores.Data
 {
@@ -35,6 +39,34 @@ namespace ParkingServiceStores.Data
                 .HasForeignKey(d => d.CarId);
 
             base.OnModelCreating(builder);
+        }
+
+        public override int SaveChanges()
+        {
+            OnBeforeSaving();
+            return base.SaveChanges();
+        }
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            OnBeforeSaving();
+            return base.SaveChangesAsync(cancellationToken);
+        }
+        private void OnBeforeSaving()
+        {
+            var entries = ChangeTracker.Entries()
+                .Where(e => e.Entity is BaseEntity && (
+                e.State == EntityState.Added
+                || e.State == EntityState.Modified));
+
+            var utcNow = DateTime.UtcNow;
+            foreach (var entry in entries)
+            {
+                (entry.Entity as BaseEntity).UpdatedOn = utcNow;
+                if (entry.State == EntityState.Added)
+                {
+                    (entry.Entity as BaseEntity).CreatedOn = utcNow;
+                }
+            }
         }
     }
 }

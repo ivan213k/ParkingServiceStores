@@ -2,7 +2,7 @@
 
 namespace ParkingServiceStores.Data.Models
 {
-    public class Debt
+    public class Debt : BaseEntity
     {
         [Key]
         public int Id { get; set; }

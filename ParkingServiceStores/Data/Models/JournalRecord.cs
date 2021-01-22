@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ParkingServiceStores.Data.Models
 {
-    public class JournalRecord
+    public class JournalRecord : BaseEntity
     {
         [Key]
         public int Id { get; set; }

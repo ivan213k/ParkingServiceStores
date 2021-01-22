@@ -59,7 +59,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        debts = (await DebtRepository.FindAsync(r => r.CarId == CarId)).OrderByDescending(r=>r.Id).ToList();
+        debts = (await DebtRepository.FindAsync(r => r.CarId == CarId)).OrderByDescending(r=>r.CreatedOn).ToList();
         car = debts.FirstOrDefault().Car;
     }
     private void BackToCarsClicked()
