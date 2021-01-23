@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ParkingServiceStores.Areas.Identity;
 using ParkingServiceStores.Data;
+using ParkingServiceStores.Data.AutoMapperProfiles;
 using ParkingServiceStores.Data.DTOModels;
 using ParkingServiceStores.Data.Models;
 using ParkingServiceStores.Data.Repositories;
@@ -38,13 +39,12 @@ namespace ParkingServiceStores
             services.AddServerSideBlazor();
             services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
             services.AddSingleton<DebtAmountCalculator>();
-            var config = new MapperConfiguration(cfg => cfg.CreateMap<CarDto, Car>()
-                    .ForPath(c => c.Owner.Name, opt => opt.MapFrom(c => c.OwnerName))
-                    .ForPath(c => c.Owner.PhoneNumber, opt => opt.MapFrom(c => c.OwnerPhoneNumber))
-                    .ForPath(c=>c.Owner.Id, opt=>opt.MapFrom(c=>c.OwnerId)).ReverseMap());
-            services.AddSingleton(config.CreateMapper());
+            var mapperConfig = new MapperConfiguration(mc => mc.AddProfile<AutoMapperProfile>());
+            services.AddSingleton(mapperConfig.CreateMapper());
+
             services.AddSyncfusionBlazor();
             Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MzgzOTkxQDMxMzgyZTM0MmUzMEVxNElNT1RPbHZuKzRqaWtDWjBNWWpxc2t5cWErOWtpZkVLb0NDZ0kxYkk9");
+          
             services.AddTransient<IRepository<Car>, CarRepository>();
             services.AddTransient<IRepository<Debt>, DebtRepository>();
             services.AddTransient<IRepository<Price>, PriceRepository>();
