@@ -7,7 +7,7 @@
 @inject NavigationManager NavigationManager;
 @inject IJSRuntime js;
 <AuthorizeView>
-    <Authorized>
+    <Authorized Context="Auth">
         <h3>Add Journal Record Page</h3>
         @if (cars == null)
         {
@@ -21,10 +21,11 @@
         else
         {
             <div class="text-left">
-                <form method="post" @onsubmit="OnFormSubmit">
+                <EditForm Model="@record" OnValidSubmit="OnFormSubmit">
+                    <FluentValidationValidator />
                     <div class="form-group">
                         <label for="inputCar">Select car:</label>
-                        <select tabindex="1" id="inputCar" @bind="record.CarId" class="custom-select">
+                        <select id="inputCar" @bind="record.CarId" class="custom-select">
                             @foreach (var car in cars)
                             {
                                 <option value="@car.Id">@car.ToString()</option>
@@ -39,8 +40,9 @@
                         <label for="inputOwnerPhone">Leaving time</label>
                         <SfDateTimePicker class="form-control" TValue="DateTime" @bind-Value="record.LeavingTime" Locale="ru"></SfDateTimePicker>
                     </div>
+                    <ValidationSummary />
                     <button class="btn btn-primary">Add record</button>
-                </form>
+                </EditForm>
             </div>
         }
     </Authorized>
@@ -65,11 +67,6 @@
 
     private async void OnFormSubmit()
     {
-        if (record.LeavingTime <= record.EntryTime)
-        {
-            await js.InvokeVoidAsync("alert", "Leaving time can not be less then Entry time!");
-            return;
-        }
         Price lastPrice = (await PriceRepository.GetAllAsync()).OrderBy(r => r.Date).LastOrDefault();
         if (lastPrice == null)
         {

@@ -2,9 +2,8 @@
 @inject NavigationManager NavigationManager;
 @inject IRepository<JournalRecord> JournalRepository;
 @inject IRepository<Car> CarRepository;
-@inject IJSRuntime js;
 <AuthorizeView>
-    <Authorized>
+    <Authorized Context="Auth">
         <h3>Edit Information About Record</h3>
 
         @if (cars == null)
@@ -14,7 +13,8 @@
         else
         {
             <div class="text-left">
-                <form method="post" @onsubmit="OnFormSubmit">
+                <EditForm Model="@record" OnValidSubmit="OnFormSubmit">
+                    <FluentValidationValidator />
                     <div class="form-group">
                         <label for="inputCar">Select car:</label>
                         <select tabindex="1" id="inputCar" @bind="record.CarId" class="custom-select">
@@ -32,8 +32,9 @@
                         <label for="inputOwnerPhone">Leaving time</label>
                         <SfDateTimePicker class="form-control" TValue="DateTime" @bind-Value="record.LeavingTime" Locale="ru"></SfDateTimePicker>
                     </div>
+                    <ValidationSummary />
                     <button class="btn btn-primary">Save</button>
-                </form>
+                </EditForm>
             </div>
         }
     </Authorized>
@@ -58,11 +59,6 @@
 
     private async void OnFormSubmit()
     {
-        if (record.LeavingTime <= record.EntryTime)
-        {
-            await js.InvokeVoidAsync("alert", "Leaving time can not be less then Entry time!");
-            return;
-        }
         await JournalRepository.UpdateAsync(record);
         NavigationManager.NavigateTo("/journal");
     }

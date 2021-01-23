@@ -6,19 +6,22 @@
         <h3>Add new price form</h3>
         <div class="text-left">
             <EditForm Model="price" OnValidSubmit="OnFormSubmit">
+                <FluentValidationValidator />
                 <div class="form-group">
                     <label for="inputOneDayPrice">One day price</label>
-                    <input @bind-value="price.OneDayPrice" type="number" min="0" class="form-control" id="inputOneDayPrice" placeholder="Enter one day price">
+                    <InputNumber @bind-Value="price.OneDayPrice" class="form-control" id="inputOneDayPrice" placeholder="Enter one day price"/>
+                    <ValidationMessage For="@(()=>price.OneDayPrice)"/>
                 </div>
                 <div class="form-group">
                     <label for="inputOneHourPrice">One hour price</label>
-                    <input @bind-value="price.OneHourPrice" type="number" min="0" class="form-control" id="inputOneHourPrice" placeholder="Enter one hour price">
+                    <InputNumber @bind-Value="price.OneHourPrice" class="form-control" id="inputOneHourPrice" placeholder="Enter one hour price" />
+                    <ValidationMessage For="@(()=>price.OneHourPrice)" />
                 </div>
                 <div class="form-group">
                     <label for="inputDate">Date</label>
-                    <input @bind-value="price.Date" type="date" class="form-control" id="inputDate" placeholder="Enter Date">
+                    <InputDate @bind-Value="price.Date" class="form-control" id="inputDate" placeholder="Enter Date" />
+                    <ValidationMessage For="@(()=>price.Date)" />
                 </div>
-
                 <button class="btn btn-primary">Add new price</button>
             </EditForm>
         </div>
