@@ -2,6 +2,11 @@
 @inject NavigationManager NavigationManager;
 @inject IRepository<JournalRecord> JournalRepository;
 @inject IRepository<Car> CarRepository;
+@inject IRepository<Price> PriceRepository;
+@inject IRepository<Debt> DebtRepository;
+@inject DebtAmountCalculator DebtAmountCalculator;
+@inject NavigationManager NavigationManager;
+@inject IJSRuntime js;
 <AuthorizeView>
     <Authorized Context="Auth">
         <h3>Edit Information About Record</h3>
@@ -30,7 +35,7 @@
                     </div>
                     <div class="form-group">
                         <label for="inputOwnerPhone">Leaving time</label>
-                        <SfDateTimePicker class="form-control" TValue="DateTime" @bind-Value="record.LeavingTime" Locale="ru"></SfDateTimePicker>
+                        <SfDateTimePicker class="form-control" TValue="DateTime?" @bind-Value="record.LeavingTime" Locale="ru"></SfDateTimePicker>
                     </div>
                     <ValidationSummary />
                     <button class="btn btn-primary">Save</button>
@@ -60,7 +65,24 @@
     private async void OnFormSubmit()
     {
         await JournalRepository.UpdateAsync(record);
+        if (record.LeavingTime != null)
+        {
+            await AddDebt();
+        }
         NavigationManager.NavigateTo("/journal");
     }
-
+    private async Task AddDebt()
+    {
+        Price lastPrice = (await PriceRepository.GetAllAsync()).OrderBy(r => r.Date).LastOrDefault();
+        if (lastPrice == null)
+        {
+            await js.InvokeVoidAsync("alert", "Price list is empty! Add price in Administration menu, before.");
+            return;
+        }
+        Debt debt = new Debt();
+        debt.CarId = record.CarId;
+        TimeSpan period = record.LeavingTime.Value - record.EntryTime;
+        debt.DebtAmount = DebtAmountCalculator.CalculateDebtAmount(period, lastPrice);
+        await DebtRepository.AddAsync(debt);
+    }
 }

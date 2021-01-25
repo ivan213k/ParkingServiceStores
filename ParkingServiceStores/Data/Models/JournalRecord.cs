@@ -10,7 +10,7 @@ namespace ParkingServiceStores.Data.Models
 
         public DateTime EntryTime { get; set; }
 
-        public DateTime LeavingTime { get; set; }
+        public DateTime? LeavingTime { get; set; }
 
         public int CarId { get; set; }
         public Car Car { get; set; }

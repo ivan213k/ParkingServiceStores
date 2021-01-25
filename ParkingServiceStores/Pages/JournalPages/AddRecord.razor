@@ -38,7 +38,7 @@
                     </div>
                     <div class="form-group">
                         <label for="inputOwnerPhone">Leaving time</label>
-                        <SfDateTimePicker class="form-control" TValue="DateTime" @bind-Value="record.LeavingTime" Locale="ru"></SfDateTimePicker>
+                        <SfDateTimePicker class="form-control" TValue="DateTime?" @bind-Value="record.LeavingTime" Locale="ru"></SfDateTimePicker>
                     </div>
                     <ValidationSummary />
                     <button class="btn btn-primary">Add record</button>
@@ -67,25 +67,34 @@
 
     private async void OnFormSubmit()
     {
-        Price lastPrice = (await PriceRepository.GetAllAsync()).OrderBy(r => r.Date).LastOrDefault();
-        if (lastPrice == null)
-        {
-            await js.InvokeVoidAsync("alert", "Price list is empty! Add price in Administration menu, before.");
-            return;
-        }
         await JournalRepository.AddAsync(record);
 
-        Debt debt = new Debt();
-        debt.CarId = record.CarId;
-        TimeSpan period = record.LeavingTime - record.EntryTime;
-        debt.DebtAmount = DebtAmountCalculator.CalculateDebtAmount(period, lastPrice);
-        await DebtRepository.AddAsync(debt);
+        if (record.LeavingTime.HasValue)
+        {
+            await AddDebt();
+        }
+
         NavigationManager.NavigateTo("/journal");
     }
 
     private void OnAddCarClicked()
     {
         NavigationManager.NavigateTo("/AddCar");
+    }
+
+    private async Task AddDebt()
+    {
+        Price lastPrice = (await PriceRepository.GetAllAsync()).OrderBy(r => r.Date).LastOrDefault();
+        if (lastPrice == null)
+        {
+            await js.InvokeVoidAsync("alert", "Price list is empty! Add price in Administration menu, before.");
+            return;
+        }
+        Debt debt = new Debt();
+        debt.CarId = record.CarId;
+        TimeSpan period = record.LeavingTime.Value - record.EntryTime;
+        debt.DebtAmount = DebtAmountCalculator.CalculateDebtAmount(period, lastPrice);
+        await DebtRepository.AddAsync(debt);
     }
 }
 
